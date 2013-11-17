@@ -1,0 +1,35 @@
+<!Doctype HTML>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Pusher Test</title>
+
+</head>
+<body>
+
+<h1>Testing <img src =https://app.pusher.com/assets/logo_light-3097a1d8f0c82c56728efc1f704d0ec1.png style="display:inline;"/></h1>
+
+<div id="connection">&dash;</div>
+
+<p>demo binding to events on the pusher.connection object </p>
+
+
+<script src="http://js.pusher.com/2.1/pusher.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+//insert key below
+var appKey = '##########';
+var pusher = new Pusher(appKey);
+
+
+pusher.connection.bind('state_change', function (Callback){
+document.getElementById('connection').innerHTML ='The current connection state is: <b>' + Callback.current + '</b>';
+});
+
+</script>
+</body>
+
+
+
+
+
+</html>
