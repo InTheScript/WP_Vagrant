@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Google Maps Demo</title>
+
+<!-- Style the map -->
+<style type="text/css">
+#map{
+
+width: 100%;
+height:400px;
+
+}
+</style>
+
+<script src="/map/scripts/jquery-1.10.2.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=weather"></script>
+<script>
+
+
+x = navigator.geolocation;
+
+//check if position is available if it is then proceed to success function
+x.getCurrentPosition(success, failure);
+
+
+//the 'position' var in the success function comes from the getCurrentPosition method. It's a reserved property
+function success(position) {
+	var mylat = position.coords.latitude;
+	var mylong = position.coords.longitude;
+	
+	//Google-API-ready latitude and longitude string
+	
+	var coords = new google.maps.LatLng(mylat, mylong);
+	
+	//Setting up the Google Map with options
+	var mapOptions = {
+	zoom: 2,
+	center: coords,
+	mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+	
+	// Creating the Map
+	var map = new google.maps.Map(document.getElementById("map"), mapOptions);
+	
+	
+	//Create an array to store the settings for the icon
+	var iconSetup = {
+    url: 'http://cdn-img.easyicon.net/png/2/280.png',
+    // This marker is 20 pixels wide by 32 pixels tall.
+    size: new google.maps.Size(65, 65),
+    // This allows you to set the origin coordinates for the icon within a sprite. The origin for this image is 0,0.
+    origin: new google.maps.Point(0,0),
+    // The anchor for this image is the base of the flagpole at 0,32.
+    anchor: new google.maps.Point(0, 32)
+	};
+
+    // Creating the marker with an array for it's optional settings
+	var marker = new google.maps.Marker({
+		map: map, 
+		position: coords, 
+		icon: iconSetup,
+		draggable:true,
+    	animation: google.maps.Animation.DROP
+	});
+
+	//add in some weather data
+	var weatherLayer = new google.maps.weather.WeatherLayer({
+		temperatureUnits: google.maps.weather.TemperatureUnit.FARENHEIT
+	});
+
+	//Set the new google maps weather layer object to use the current map
+	weatherLayer.setMap(map);
+
+	//create an event listner to check for clicks on the marker object
+	google.maps.event.addListener(marker,'click',toggleBouncy);
+
+	//and now the function which gets called when the event is triggered
+	function toggleBouncy(){
+		if (marker.getAnimation() !=null) {
+			marker.setAnimation(null);
+		} 	else { 
+			marker.setAnimation(google.maps.Animation.BOUNCE);
+		}
+	}
+
+	//array of markers
+	var placeMarkers = [
+	  	new google.maps.LatLng(52.511467, 13.447179),
+	  	new google.maps.LatLng(52.549061, 13.422975),
+	  	new google.maps.LatLng(52.497622, 13.396110),
+	  	new google.maps.LatLng(52.517683, 13.394393)
+	];
+
+	//create empty array
+	var markers = [];
+	var iter = 0;
+	
+	//run the function (functions won't run unless invoked explicitly)
+	drop();
+
+	function drop() {
+		//because arrays are base zero you need to stop 1 beneath full length
+  		for (var i = 0; i < placeMarkers.length; i++) {
+    		setTimeout(function() {
+      		addMarker();
+      		//the timeout length  between each pin drop function call
+    	}, i * 200);
+  		}
+	}
+
+	function addMarker() {
+	  	markers.push(new google.maps.Marker({
+	    	map: map,
+	    	position: placeMarkers[iter],
+	    	draggable: false,
+	    	icon: iconSetup,
+	    	animation: google.maps.Animation.DROP
+	  	}));
+	  	iter++;
+	}
+
+	/* The below get called as part of the success method if coordinates are found */
+	$('#lat').html(mylat);
+	$('#long').html(mylong);
+
+//------------------------------------------------------------------------------------
+
+
+};
+
+function failure() {
+	$('#lat').html("<p>It no work</p>");
+};
+
+</script>
+</head>
+<body>
+
+<!-- Map placeholder -->
+<div id="map"> &nbsp;</div>
+<!-- End map placeholder -->
+
+
+<!-- print latitude and longitude helper values to screen -->
+
+<div id="lat">Latitude</div>
+<div id="long">Longitude</div>
+
+</body>
+
+</html>
